@@ -29,7 +29,7 @@ with DAG(
     dag_id="My First CS 280 DAG",
     schedule_interval="0 10 * * *",
     start_date=pendulum.datetime(2023, 9, 1, tz="US/Pacific"),
-    catchup=False,
+    catchup=False, 
 ) as dag:
     start_task = DummyOperator(task_id="start_task")
     first_task = PythonOperator(task_id="first_task", python_callable=first_task_function)
