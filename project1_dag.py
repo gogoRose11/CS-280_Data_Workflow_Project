@@ -35,8 +35,8 @@ def get_twitter_api_data_func(ti: TaskInstance, **kwargs):
         user_url = f"https://api.twitter.com/2/users/{user}"
         request = requests.get(user_url, headers=get_auth_header(), params={"user.fields": user_fields})
         log.info(f"USER REQUEST: {user}")
-        log.info(request.json)
-        user_requests.append(request.json)
+        log.info(request.json())
+        user_requests.append(request.json())
     
 
     # TWEET REQUESTS
@@ -47,8 +47,8 @@ def get_twitter_api_data_func(ti: TaskInstance, **kwargs):
         tweet_url = f"https://api.twitter.com/2/tweets/{tweet}"
         request = requests.get(tweet_url, headers=get_auth_header(), params={"tweet.fields": tweet_fields})
         log.info(f"TWEET REQUEST: {tweet}")
-        log.info(request.json)
-        tweet_requests.append(request.json)
+        log.info(request.json())
+        tweet_requests.append(request.json())
 
     # PUSH TO NEXT TASK
     ti.xcom_push("user_requests", user_requests)
