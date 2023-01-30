@@ -13,7 +13,7 @@ from airflow.models import TaskInstance
 
 
 def get_auth_header():
-  my_bearer_token = Variable.get("TWITTER_BEARER_TOKEN", deserialize_json=True)
+  my_bearer_token = Variable.get("TWITTER_BEARER_TOKEN")
   #my_bearer_token = "AAAAAAAAAAAAAAAAAAAAACwllgEAAAAA2pCuFW3x5ABAGkB5%2F%2F5n1CyTCNs%3DleybJQXEwrhTAuIPr20a49NhY5R2ii0SsvMoVxn4Beg3Zt7oL9"
   return {"Authorization": f"Bearer {my_bearer_token}"}
 
