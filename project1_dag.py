@@ -64,6 +64,7 @@ def transform_twitter_api_data_func(ti: TaskInstance, **kwargs):
 
     user_client = storage.Client()
     user_bucket = user_client.get_bucket("e-r-apache-airflow-cs280")
+    log.info("MADE IT PAST FIRST USER_DF")
     user_bucket.blob("data/users.csv").upload_from_string(user_df.to_csv(index=False), "text/csv")
 
     
@@ -88,7 +89,7 @@ def get_tweet_pd(tweet_requests):
         pub = data['public_metrics']
         del data['public_metrics']
         data.update(pub)
-        tweet_df = user_df.append(data, ignore_index=True)
+        tweet_df = tweet_df.append(data, ignore_index=True)
 
     return tweet_df
 
