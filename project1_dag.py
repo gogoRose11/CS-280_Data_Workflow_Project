@@ -64,7 +64,7 @@ def transform_twitter_api_data_func(ti: TaskInstance, **kwargs):
 
     user_client = storage.Client()
     user_bucket = user_client.get_bucket("e-r-apache-airflow-cs280")
-    user_bucket.blob("data/users.csv").upload_from_string(user.df.to_csv(index=False), "text/csv")
+    user_bucket.blob("data/users.csv").upload_from_string(user_df.to_csv(index=False), "text/csv")
 
     
     tweet_requests = ti.xcom_pull(key="tweet_requests", task_ids="twitter_extract_task")
@@ -72,7 +72,7 @@ def transform_twitter_api_data_func(ti: TaskInstance, **kwargs):
 
     client = storage.Client()
     bucket = client.get_bucket("e-r-apache-airflow-cs280")
-    bucket.blob("data/tweets.csv").upload_from_string(tweet.df.to_csv(index=False), "text/csv")
+    bucket.blob("data/tweets.csv").upload_from_string(tweet_df.to_csv(index=False), "text/csv")
 
 
 def get_tweet_pd(tweet_requests):
