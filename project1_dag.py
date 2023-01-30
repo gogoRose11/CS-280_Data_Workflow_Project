@@ -36,7 +36,7 @@ def get_twitter_api_data_func(ti: TaskInstance, **kwargs):
         request = requests.get(user_url, headers=get_auth_header(), params={"user.fields": user_fields})
         log.info(f"USER REQUEST: {user}")
         log.info(request.json())
-        user_requests.append(request)
+        user_requests.append(request.json())
     
 
     # TWEET REQUESTS
@@ -48,7 +48,7 @@ def get_twitter_api_data_func(ti: TaskInstance, **kwargs):
         request = requests.get(tweet_url, headers=get_auth_header(), params={"tweet.fields": tweet_fields})
         log.info(f"TWEET REQUEST: {tweet}")
         log.info(request.json())
-        tweet_requests.append(request)
+        tweet_requests.append(request.json())
 
     # PUSH TO NEXT TASK
     ti.xcom_push("user_requests", user_requests)
@@ -78,7 +78,8 @@ def get_tweet_pd(tweet_requests):
 
     # LOOP THROUGH TWEET RESPONSES
     for tweet in tweet_requests:
-        resp = tweet.json()
+        #resp = tweet.json()
+        resp = tweet
         data = resp.get('data')
         del data['edit_history_tweet_ids']
         del data['author_id']
@@ -94,7 +95,8 @@ def get_user_pd(user_requests):
 
     # LOOP THROUGH USER RESPONSES
     for user in user_requests:
-        resp = user.json()
+        #resp = user.json()
+        resp = user
         data = resp.get('data')
         del data['profile_image_url']
         del data['description']
