@@ -86,6 +86,10 @@ def transform_twitter_api_data_func(ti: TaskInstance, **kwargs):
     log.info("TWEET DATAFRAME AT END OF TRANSFORMATION")
     log.info(tweet_df)
     tweet_dict = tweet_df.to_dict()
+    log.info("USER DICTIONARY AT END OF TRANSFORMATION")
+    log.info(user_dict)
+    log.info("TWEET DICT AT END OF TRANSFORMATION")
+    log.info(tweet_dict)
     ti.xcom_push("user_df", user_dict)
     ti.xcom_push("tweet_df", tweet_dict)
 
