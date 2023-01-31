@@ -76,10 +76,12 @@ def transform_twitter_api_data_func(ti: TaskInstance, **kwargs):
     log.info("ABOUT TO PUSH TO NEXT TASK")
 
     # PUSH TO NEXT TASK
-    user_json = user_df.to_json()
-    tweet_json = tweet_df.to_json()
-    ti.xcom_push("user_df", user_json)
-    ti.xcom_push("tweet_df", tweet_json)
+    #user_json = user_df.to_json()
+    #tweet_json = tweet_df.to_json()
+    user_dict = user_df.to_dict()
+    tweet_dict = tweet_df.to_dict()
+    ti.xcom_push("user_df", user_dict)
+    ti.xcom_push("tweet_df", tweet_dict)
 
 
 
@@ -126,13 +128,13 @@ def load_data_func(ti:TaskInstance, **kwargs):
 
     log.info("ENTERED LOAD DATA FUNCTION")
     client = Client("lfshpao6g48kls6t0nav0p")
-    user_json = ti.xcom_pull(key="user_df", task_ids="transform_twitter_api_data_task")
-    log.info(f"USER_JSON TYPE: {type(user_json)}")
-    user_df = pd.read_json(user_json)
+    user_dict = ti.xcom_pull(key="user_df", task_ids="transform_twitter_api_data_task")
+    log.info(f"USER_DICTTYPE: {type(user_json)}")
+    user_df = pd.DataFrame.from_dict(user_dict)
     databox_helper_users(user_df, client)
 
-    tweet_json = ti.xcom_pull(key="tweet_df", task_ids="transform_twitter_api_data_task")
-    tweet_df = pd.read_json(tweet_json)
+    tweet_dict = ti.xcom_pull(key="tweet_df", task_ids="transform_twitter_api_data_task")
+    tweet_df = pd.DataFrame.from_dict(tweet_dict)
     databox_helper_tweets(tweet_df, client)
 
 
