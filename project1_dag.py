@@ -110,10 +110,10 @@ def databox_helper_users(user_df, client):
         name_tweet_count = name + '_tweet_count'
         name_listed_count = name + '_listed_count'
         #print(f"{full_name}: {followers_count}")
-        client.push(name_followers_count, followers_count)
-        client.push(name_following_count, following_count)
-        client.push(name_tweet_count, tweet_count)
-        client.push(name_listed_count, listed_count)
+        client.push(name_followers_count, int(followers_count))
+        client.push(name_following_count, int(following_count))
+        client.push(name_tweet_count, int(tweet_count))
+        client.push(name_listed_count, int(listed_count))
         log.info(f"PUSHED: {name}")
 
 
@@ -133,10 +133,10 @@ def databox_helper_tweets(tweet_df, client):
         name_impression_count = name + '_impression_count'
         name_retweet_count = name + '_retweet_count'
         #print(f"{full_name}: {reply_count}")
-        client.push(name_reply_count, reply_count)
-        client.push(name_like_count, like_count)
-        client.push(name_impression_count, impression_count)
-        client.push(name_retweet_count, retweet_count)
+        client.push(name_reply_count, int(reply_count))
+        client.push(name_like_count, int(like_count))
+        client.push(name_impression_count, int(impression_count))
+        client.push(name_retweet_count, int(retweet_count))
         log.info(f"PUSHED: {name}")
 
 def load_data_func(ti:TaskInstance, **kwargs):
