@@ -8,7 +8,7 @@ from airflow.operators.dummy import DummyOperator
 from google.cloud import storage
 from airflow.models import Variable
 from airflow.models import TaskInstance
-
+from databox import Client
 
 
 
@@ -75,6 +75,62 @@ def transform_twitter_api_data_func(ti: TaskInstance, **kwargs):
     bucket = client.get_bucket("e-r-apache-airflow-cs280")
     bucket.blob("data/tweets.csv").upload_from_string(tweet_df.to_csv(index=False), "text/csv")
 
+    # PUSH TO NEXT TASK
+    ti.xcom_push("user_df", user_df)
+    ti.xcom_push("tweet_df", tweet_df)
+
+
+def databox_helper_users(user_df, client):
+
+    for index in user_df.index:
+        name = user_df['username'][index]
+        followers_count = user_df['followers_count'][index]
+        following_count = user_df['following_count'][index]
+        tweet_count = user_df['tweet_count'][index]
+        listed_count = user_df['listed_count'][index]
+        name_followers_count = name + '_followers_count'
+        name_following_count = name + '_following_count'
+        name_tweet_count = name + '_tweet_count'
+        name_listed_count = name + '_listed_count'
+        #print(f"{full_name}: {followers_count}")
+        client.push(name_followers_count, followers_count)
+        client.push(name_following_count, following_count)
+        client.push(name_tweet_count, tweet_count)
+        client.push(name_listed_count, listed_count)
+        log.info(f"PUSHED: {name}")
+
+
+def databox_helper_tweets(tweet_df, client):
+
+    for index in tweet_df.index:
+        name = tweet_df['id'][index]
+        reply_count = tweet_df['reply_count'][index]
+        like_count = tweet_df['like_count'][index]
+        impression_count = tweet_df['impression_count'][index]
+        retweet_count = tweet_df['retweet_count'][index]
+        name_reply_count = name + '_reply_count'
+        name_like_count = name + '_like_count'
+        name_impression_count = name + '_impression_count'
+        name_retweet_count = name + '_retweet_count'
+        #print(f"{full_name}: {reply_count}")
+        client.push(name_reply_count, reply_count)
+        client.push(name_like_count, like_count)
+        client.push(name_impression_count, impression_count)
+        client.push(name_retweet_count, retweet_count)
+        log.info(f"PUSHED: {name}")
+
+def load_data_func(ti:TaskInstance, **kwargs):
+    client = Client("lfshpao6g48kls6t0nav0p")
+    user_df = ti.xcom_pull(key="user_df", task_ids="transform_twitter_api_data_task")
+    databox_helper_users(user_df, client)
+
+    tweet_df = ti.xcom_pull(key="tweet_df", task_ids="transform_twitter_api_data_task")
+    databox_helper_tweets(tweet_df, client)
+
+
+
+
+
 
 def get_tweet_pd(tweet_requests):
     tweet_df = pd.DataFrame(columns=['id','text','retweet_count','reply_count','like_count','quote_count','impression_count'])
@@ -129,6 +185,11 @@ with DAG(
         python_callable=transform_twitter_api_data_func,
         provide_context=True,
     )
+    load_data_task = PythonOperator(
+        task_id="databox_load_task",
+        python_callable=load_data_func,
+        provide_context=True,
+    )
     
 
-get_twitter_api_data_task >> transform_twitter_api_data_task
+get_twitter_api_data_task >> transform_twitter_api_data_task >> load_data_task
