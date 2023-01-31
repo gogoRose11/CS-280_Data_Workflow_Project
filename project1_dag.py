@@ -12,8 +12,6 @@ from databox import Client
 
 
 
-
-
 def get_auth_header():
   my_bearer_token = Variable.get("TWITTER_BEARER_TOKEN")
   #my_bearer_token = "AAAAAAAAAAAAAAAAAAAAACwllgEAAAAA2pCuFW3x5ABAGkB5%2F%2F5n1CyTCNs%3DleybJQXEwrhTAuIPr20a49NhY5R2ii0SsvMoVxn4Beg3Zt7oL9"
@@ -75,9 +73,12 @@ def transform_twitter_api_data_func(ti: TaskInstance, **kwargs):
     bucket = client.get_bucket("e-r-apache-airflow-cs280")
     bucket.blob("data/tweets.csv").upload_from_string(tweet_df.to_csv(index=False), "text/csv")
 
+    log.info("ABOUT TO PUSH TO NEXT TASK")
+
     # PUSH TO NEXT TASK
     ti.xcom_push("user_df", user_df)
     ti.xcom_push("tweet_df", tweet_df)
+
 
 
 def databox_helper_users(user_df, client):
@@ -120,6 +121,8 @@ def databox_helper_tweets(tweet_df, client):
         log.info(f"PUSHED: {name}")
 
 def load_data_func(ti:TaskInstance, **kwargs):
+
+    log.info("ENTERED LOAD DATA FUNCTION")
     client = Client("lfshpao6g48kls6t0nav0p")
     user_df = ti.xcom_pull(key="user_df", task_ids="transform_twitter_api_data_task")
     databox_helper_users(user_df, client)
