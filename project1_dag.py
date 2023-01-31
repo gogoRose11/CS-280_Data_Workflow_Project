@@ -112,6 +112,7 @@ def databox_helper_tweets(tweet_df, client):
     log.info("ENTERED DATABOX TWEETS HELPER")
     log.info(f"TWEET_DF tYPE: {type(tweet_df)}")
     for index in tweet_df.index:
+        log.info("ENTERED TWEETS FOR LOOP")
         name = tweet_df['id'][index]
         reply_count = tweet_df['reply_count'][index]
         like_count = tweet_df['like_count'][index]
@@ -135,6 +136,8 @@ def load_data_func(ti:TaskInstance, **kwargs):
     user_dict = ti.xcom_pull(key="user_df", task_ids="transform_twitter_api_data_task")
     log.info(f"USER_DICTYPE: {type(user_dict)}")
     user_df = pd.DataFrame.from_dict(user_dict)
+    log.info("USER DF:")
+    log.info(user_df)
     databox_helper_users(user_df, client)
 
     tweet_dict = ti.xcom_pull(key="tweet_df", task_ids="transform_twitter_api_data_task")
