@@ -87,6 +87,8 @@ def transform_twitter_api_data_func(ti: TaskInstance, **kwargs):
 
 def databox_helper_users(user_df, client):
 
+    log.info("ENTERED DATABOX USER HELPER")
+    log.info(f"USER_DF Type: {type(user_df)}")
     for index in user_df.index:
         name = user_df['username'][index]
         followers_count = user_df['followers_count'][index]
@@ -107,6 +109,8 @@ def databox_helper_users(user_df, client):
 
 def databox_helper_tweets(tweet_df, client):
 
+    log.info("ENTERED DATABOX TWEETS HELPER")
+    log.info(f"TWEET_DF tYPE: {type(tweet_df)}")
     for index in tweet_df.index:
         name = tweet_df['id'][index]
         reply_count = tweet_df['reply_count'][index]
