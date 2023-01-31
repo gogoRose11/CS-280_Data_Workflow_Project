@@ -129,7 +129,7 @@ def load_data_func(ti:TaskInstance, **kwargs):
     log.info("ENTERED LOAD DATA FUNCTION")
     client = Client("lfshpao6g48kls6t0nav0p")
     user_dict = ti.xcom_pull(key="user_df", task_ids="transform_twitter_api_data_task")
-    log.info(f"USER_DICTTYPE: {type(user_json)}")
+    log.info(f"USER_DICTYPE: {type(user_dict)}")
     user_df = pd.DataFrame.from_dict(user_dict)
     databox_helper_users(user_df, client)
 
