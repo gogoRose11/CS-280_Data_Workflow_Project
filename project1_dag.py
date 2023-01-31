@@ -58,6 +58,8 @@ def get_twitter_api_data_func(ti: TaskInstance, **kwargs):
 
 def transform_twitter_api_data_func(ti: TaskInstance, **kwargs):
     user_requests = ti.xcom_pull(key="user_requests", task_ids="twitter_extract_task")
+    log.info("USER REQUESTS")
+    log.info(user_requests)
     user_df = get_user_pd(user_requests)
 
     user_client = storage.Client()
@@ -171,6 +173,7 @@ def get_user_pd(user_requests):
 
     # LOOP THROUGH USER RESPONSES
     for user in user_requests:
+        log.info("ENTERED USER REQUESTS FOR LOOP - GET USER PD")
         #resp = user.json()
         resp = user
         data = resp.get('data')
@@ -181,6 +184,8 @@ def get_user_pd(user_requests):
         data.update(pub)
         user_df = user_df.append(data, ignore_index=True)
 
+    log.info("USER DATAFRAME AT THE END OF GET USER PD")
+    log.info(user_df)
     return user_df
 
 
