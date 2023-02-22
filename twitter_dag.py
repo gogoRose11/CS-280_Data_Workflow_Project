@@ -63,7 +63,7 @@ def call_api_task_function(ti: TaskInstance, **kwargs):
     #user_ids = Variable.get(f"TWITTER_USER_IDS", [], deserialize_json=True)
     user_fields = "public_metrics,username,id"
     for user in users_list:
-        user_url = f"https://api.twitter.com/2/users/{user.id}"
+        user_url = f"https://api.twitter.com/2/users/{user.user_id}"
         request = requests.get(user_url, headers=get_auth_header(), params={"user.fields": user_fields})
         log.info(f"USER REQUEST: {user.name}")
         log.info(request.json())
