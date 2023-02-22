@@ -40,7 +40,7 @@ def load_data_task_function(ti: TaskInstance, **kwargs):
     for user in users_list:
         log.info(f"Getting TWEETS for: {user.name}")
         response = requests.get(tweets_url, headers=get_auth_header(), params={"user_id": user.user_id, "count": 5})
-        tweets_list.append(response)
+        tweets_list.append(response.json())
     
     log.info(f"TWEETS LIST: {tweets_list}")
 
