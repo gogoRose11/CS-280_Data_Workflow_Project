@@ -50,9 +50,29 @@ def load_data_task_function(ti: TaskInstance, **kwargs):
     ti.xcom_push("tweet_list", tweets_list)
     return
 
+
+
 def call_api_task_function(ti: TaskInstance, **kwargs):
     log.info("ENTERED: CALL API TASK FUNCTION")
+    users_list = ti.xcom_pull(key='users_list', task_ids='load_data_task')
+    tweets_list = ti.xcom_pull(key='tweet_list', task_ids='load_data_task')
+
+
+    # GET UPDATED STATISTICS FOR EVERY USER
+    user_requests = []
+    #user_ids = Variable.get(f"TWITTER_USER_IDS", [], deserialize_json=True)
+    user_fields = "public_metrics,username,id"
+    for user in users_list:
+        user_url = f"https://api.twitter.com/2/users/{user.id}"
+        request = requests.get(user_url, headers=get_auth_header(), params={"user.fields": user_fields})
+        log.info(f"USER REQUEST: {user.name}")
+        log.info(request.json())
+        user_requests.append(request.json())
     
+
+    ti.xcom_push("users_list", users_list)
+    ti.xcom_push("tweet_list", tweets_list)
+    ti.xcom_push("users_requests", user_requests)
     return
 
 def transform_data_task_function(ti: TaskInstance, **kwargs):
