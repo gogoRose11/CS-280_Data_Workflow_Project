@@ -4,7 +4,7 @@ import pendulum
 from airflow.operators.python import PythonOperator
 from airflow.operators.dummy import DummyOperator
 from models.config import Session #You would import this from your config file
-from models.users import User
+from models.user import User
 
 
 def load_data_task_function():
