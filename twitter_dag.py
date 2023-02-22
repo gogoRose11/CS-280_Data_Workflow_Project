@@ -39,7 +39,7 @@ def write_data_task_function():
 with DAG(
     dag_id="Twitter_DAG",
     schedule_interval="0 9 * * *",
-    start_date=pendulum.datetime(2023, 2, 26, tz="US/Pacific"),
+    start_date=pendulum.datetime(2023, 2, 10, tz="US/Pacific"),
     catchup=False,
 ) as dag:
     
