@@ -41,10 +41,11 @@ def load_data_task_function(ti: TaskInstance, **kwargs):
     tweet_fields = "public_metrics,author_id,text,created_at"
     for user in users_list:
         log.info(f"Getting TWEETS for: {user.name}")
-        response = requests.get(tweets_url, headers=get_auth_header(), params={"user_id": user.user_id, "tweet.fields": tweet_fields, "count": 5})
+        response = requests.get(tweets_url, headers=get_auth_header(), params={"tweet.fields": tweet_fields, "count": 5})
+        log.info(f"{user.name} Tweets: {response.json()}")
         tweets_list.append(response.json())
     
-    log.info(f"TWEETS LIST: {tweets_list}")
+    #log.info(f"TWEETS LIST: {tweets_list}")
 
     # PULL USER INFORMATION AND PASS IT TO THE NEXT TASK
     # PUSH TO NEXT TASK
