@@ -106,7 +106,7 @@ def transform_data_task_function(ti: TaskInstance, **kwargs):
     return
 
 def get_user_pd(user_requests):
-    user_df = pd.DataFrame(columns=['user_id' 'username','name','created_at','followers_count','following_count','tweet_count','listed_count','date'])
+    user_df = pd.DataFrame(columns=['user_id', 'username','name','created_at','followers_count','following_count','tweet_count','listed_count','date'])
     # user_id, username, name, created_at .... followers_count, following_count, tweet_count, listed_count, date
 
 
