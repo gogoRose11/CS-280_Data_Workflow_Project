@@ -151,17 +151,18 @@ def get_tweet_pd(last_five_tweets, tweet_requests):
     log.info(tweet_df)
 
     # PARSE THROUGH LAST FIVE TWEETS
-    for tweet in last_five_tweets:
-        user = tweet['user']
-        data = {}
-        data['tweet_id'] = tweet['id']
-        data['user_id'] = user['id']
-        data['text'] = tweet['text']
-        data['created_at'] = tweet['created_at']
-        data['retweet_count'] = tweet['retweet_count']
-        data['favorite_count'] = tweet['favorite_count']
-        data['date'] = datetime.now()
-        tweet_df = tweet_df.append(data, ignore_index=True)
+    for t in last_five_tweets:
+        for tweet in t:
+            user = tweet['user']
+            data = {}
+            data['tweet_id'] = tweet['id']
+            data['user_id'] = user['id']
+            data['text'] = tweet['text']
+            data['created_at'] = tweet['created_at']
+            data['retweet_count'] = tweet['retweet_count']
+            data['favorite_count'] = tweet['favorite_count']
+            data['date'] = datetime.now()
+            tweet_df = tweet_df.append(data, ignore_index=True)
 
 
     # PARSE THROUGH ALL TWEETS
