@@ -11,6 +11,7 @@ from airflow.models import Variable
 from airflow.models import TaskInstance
 import pandas as pd
 from datetime import datetime
+from google.cloud import storage
 
 
 def get_auth_header():
@@ -100,8 +101,13 @@ def transform_data_task_function(ti: TaskInstance, **kwargs):
     updated_tweets = ti.xcom_pull(key='updated_tweets', task_ids='call_api_task')
     updated_users = ti.xcom_pull(key='updated_users', task_ids='call_api_task')
 
+    # CREATE USERS DATAFRAME
     user_df = get_user_pd(updated_users)
 
+    # SEND USERS DATAFRAME TO GOOGLE CLOUD BUCKET
+    user_client = storage.Client()
+    user_bucket = user_client.get_bucket("e-r-apache-airflow-cs280")
+    user_bucket.blob("data/users.csv").upload_from_string(user_df.to_csv(index=False), "text/csv")
 
     return
 
