@@ -260,6 +260,8 @@ def update_tweet_timeseries(tweet_df):
         # ADD TWEET TO DATABASE
     # UPDATE TIMESERIES
 
+    log.info("TWEET DATAFRAME")
+    log.info(tweet_df)
     tweet_df = pd.DataFrame(columns=['tweet_id', 'user_id', 'text', 'created_at', 'retweet_count', 'favorite_count', 'date'])
 
     session = Session()
