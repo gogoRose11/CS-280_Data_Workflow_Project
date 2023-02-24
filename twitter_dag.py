@@ -197,18 +197,42 @@ def write_data_task_function(ti: TaskInstance, **kwargs):
     user_df = pd.DataFrame(columns=['user_id', 'username','name','created_at','followers_count','following_count','tweet_count','listed_count','date'])
     log.info(f"USER DATAFRAME BEFORE GOOGLE CLOUD CALL")
     log.info(user_df)
+
     # GET USER.CSV FROM GOOGLE BUCKET
     user_client = storage.Client()
     user_bucket = user_client.get_bucket("e-r-apache-airflow-cs280")
-    #user_bucket.blob("data/users.csv").upload_from_string(user_df.to_csv(index=False), "text/csv")
-
     blob = user_bucket.get_blob('data/users.csv')
+
+    # CONVERT USERS CSV TO PANDAS DATAFRAME
     users_csv = blob.download_as_string()
     user_df = pd.read_csv(io.BytesIO(users_csv))
 
     log.info(f"USER DATAFRAME AFTER GOOGLE CLOUD CALL")
     log.info(user_df)
+
+    update_user_timeseries(user_df)
     return
+
+def update_user_timeseries(user_df):
+
+    # RETRIEVE THE 10 USERS IN THE DATABASE
+    session = Session()
+    users_timeseries_list = session.query(User_Timeseries).all() 
+    users_list = session.query(User).all()
+    log.info(f"USER LIST: {users_list}")
+
+    if len(users_timeseries_list) == 0:
+        # ADD USERS TO TIMESERIES
+        # LOOP THROUGH PANDAS DATAFRAME AND ADD EACH ONE
+        for index, row in user_df.iterrows():
+            curr_user = session.query(User).filter(User.user_id == row['user_id'])
+            user = User_Timeseries(id=curr_user.id, user_id=row['user_id'], followers_count=row['followers_count'],
+                                   following_count=row['following_count'], tweet_count=row['tweet_count'],
+                                   listed_count=row['listed_count'], date=row['date'])
+            session.add(user)
+    session.commit()
+    session.close()
+
 
 with DAG(
     dag_id="Twitter_DAG",
