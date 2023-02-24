@@ -48,8 +48,7 @@ def load_data_task_function(ti: TaskInstance, **kwargs):
         last_five_tweets.append(response.json())
     
     
-    log.info("LAST FIVE TWEETS")
-    log.info(last_five_tweets)
+
     # PUSH USERS LIST, TWEET LIST, AND LAST 5 TWEETS PER USER TO CALL API TASK
     ti.xcom_push("users_list", users_list)
     ti.xcom_push("tweet_list", tweets_list)
@@ -64,7 +63,7 @@ def call_api_task_function(ti: TaskInstance, **kwargs):
     # PULL USERS LIST, TWEET LIST, AND LAST FIVE TWEETS FROM PREVIOUS LOAD DATA TASK
     users_list = ti.xcom_pull(key='users_list', task_ids='load_data_task')
     tweet_list = ti.xcom_pull(key='tweet_list', task_ids='load_data_task')
-    last_five_tweets = ti.xcom_pull(key='last_five_tweets', task_ids='last_five_tweets') # last_5_tweets
+    last_five_tweets = ti.xcom_pull(key='last_five_tweets', task_ids='load_data_task') # last_5_tweets
 
     # GET UPDATED STATISTICS FOR EVERY USER
     updated_users = []
