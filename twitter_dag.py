@@ -42,7 +42,8 @@ def load_data_task_function(ti: TaskInstance, **kwargs):
     tweet_fields = "public_metrics,author_id,text,created_at"
     for user in users_list:
         log.info(f"Getting TWEETS for: {user.name}")
-        response = requests.get(tweets_url, headers=get_auth_header(), params={"user_id": user.user_id,"count": 5})
+        response = requests.get(tweets_url, headers=get_auth_header(), params={"user_id": user.user_id,"count": 5, 'include_rts':False,
+                                                                               'exclude_replies':True})
         log.info(f"{user.name} Tweets: {response.json()}")
         last_five_tweets.append(response.json())
     
@@ -50,7 +51,7 @@ def load_data_task_function(ti: TaskInstance, **kwargs):
     # PUSH USERS LIST, TWEET LIST, AND LAST 5 TWEETS PER USER TO CALL API TASK
     ti.xcom_push("users_list", users_list)
     ti.xcom_push("tweet_list", tweets_list)
-    ti.xcom_push('last_five_tweets', last_five_tweets)
+    ti.xcom_push('last_five_tweets', last_five_tweets) # last_5_tweets
     return
 
 
@@ -61,7 +62,7 @@ def call_api_task_function(ti: TaskInstance, **kwargs):
     # PULL USERS LIST, TWEET LIST, AND LAST FIVE TWEETS FROM PREVIOUS LOAD DATA TASK
     users_list = ti.xcom_pull(key='users_list', task_ids='load_data_task')
     tweet_list = ti.xcom_pull(key='tweet_list', task_ids='load_data_task')
-    last_five_tweets = ti.xcom_pull(key='last_five_tweets', task_ids='last_five_tweets')
+    last_five_tweets = ti.xcom_pull(key='last_five_tweets', task_ids='last_five_tweets') # last_5_tweets
 
     # GET UPDATED STATISTICS FOR EVERY USER
     updated_users = []
@@ -76,7 +77,7 @@ def call_api_task_function(ti: TaskInstance, **kwargs):
 
     # GET UPDATED STATISTICS FOR EVERY TWEET
     updated_tweets = []
-    tweet_fields = "public_metrics,author_id,text"
+    tweet_fields = "public_metrics,author_id,text,created_at"
     for tweet in tweet_list:
         tweet_url = f"https://api.twitter.com/2/tweets/{tweet.tweet_id}"
         request = requests.get(tweet_url, headers=get_auth_header(), params={"tweet.fields": tweet_fields})
@@ -110,6 +111,9 @@ def transform_data_task_function(ti: TaskInstance, **kwargs):
     user_bucket = user_client.get_bucket("e-r-apache-airflow-cs280")
     user_bucket.blob("data/users.csv").upload_from_string(user_df.to_csv(index=False), "text/csv")
 
+    # CREATE TWEET DATAFRAME
+    tweet_df = get_tweet_pd(last_five_tweets, updated_tweets)
+
     return
 
 def get_user_pd(user_requests):
@@ -141,13 +145,13 @@ def get_user_pd(user_requests):
     return user_df
 
 
-def get_tweet_pd(tweet_requests):
-    tweet_df = pd.DataFrame(columns=['id','text','retweet_count','reply_count','like_count','quote_count','impression_count'])
-    df = pd.DataFrame(Columns=['tweet_id', 'user_id', 'text', 'created_at', 'retweet_count', 'favorite_count', 'date'])
+def get_tweet_pd(last_five_tweets, tweet_requests):
+    tweet_df = pd.DataFrame(columns=['tweet_id', 'user_id', 'text', 'created_at', 'retweet_count', 'favorite_count', 'date'])
 
     # tweet_id, user_id, text, created_at ... retweet_count, favorite_count, date
 
-    for tweet in tweet_requests:
+    # PARSE THROUGH LAST FIVE TWEETS
+    for tweet in last_five_tweets:
         resp = tweet
         id = tweet['id']
         del tweet['id']
@@ -234,6 +238,8 @@ def update_user_timeseries(user_df):
             session.add(user)
     session.commit()
     session.close()
+
+    # does postgress replace duplicates?
 
 
 with DAG(
