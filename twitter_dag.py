@@ -8,6 +8,7 @@ from models.config import Session #You would import this from your config file
 from models.user import User
 from models.user_timeseries import User_Timeseries
 from models.tweet import Tweet
+from models.tweet_timeseries import Tweet_Timeseries
 from airflow.models import Variable
 from airflow.models import TaskInstance
 import pandas as pd
@@ -32,7 +33,7 @@ def load_data_task_function(ti: TaskInstance, **kwargs):
     # RETRIEVE ALL TWEETS IN THE DATABASE
     session = Session()
     tweets_list = session.query(Tweet).all()
-    log.info(f"Size of TWEETS LIST: {len(tweets_list)}")
+    #log.info(f"Size of TWEETS LIST: {len(tweets_list)}")
     session.close()
 
 
@@ -41,10 +42,10 @@ def load_data_task_function(ti: TaskInstance, **kwargs):
     last_five_tweets = []
     tweet_fields = "public_metrics,author_id,text,created_at"
     for user in users_list:
-        log.info(f"Getting TWEETS for: {user.name}")
+        #log.info(f"Getting TWEETS for: {user.name}")
         response = requests.get(tweets_url, headers=get_auth_header(), params={"user_id": user.user_id,"count": 5, 'include_rts':False,
                                                                                'exclude_replies':True})
-        log.info(f"{user.name} Tweets: {response.json()}")
+        #log.info(f"{user.name} Tweets: {response.json()}")
         last_five_tweets.append(response.json())
     
     
@@ -71,8 +72,8 @@ def call_api_task_function(ti: TaskInstance, **kwargs):
     for user in users_list:
         user_url = f"https://api.twitter.com/2/users/{user.user_id}"
         request = requests.get(user_url, headers=get_auth_header(), params={"user.fields": user_fields})
-        log.info(f"USER REQUEST: {user.name}")
-        log.info(request.json())
+        #log.info(f"USER REQUEST: {user.name}")
+        #log.info(request.json())
         updated_users.append(request.json())
 
 
@@ -82,8 +83,8 @@ def call_api_task_function(ti: TaskInstance, **kwargs):
     for tweet in tweet_list:
         tweet_url = f"https://api.twitter.com/2/tweets/{tweet.tweet_id}"
         request = requests.get(tweet_url, headers=get_auth_header(), params={"tweet.fields": tweet_fields})
-        log.info(f"TWEET REQUEST: {tweet}")
-        log.info(request.json())
+        #log.info(f"TWEET REQUEST: {tweet}")
+        #log.info(request.json())
         updated_tweets.append(request.json())
         # WHEN DO I ADD THE DATE COLUMN??? WHEN I ADD IT TO THE DATABASE?
 
@@ -117,7 +118,7 @@ def transform_data_task_function(ti: TaskInstance, **kwargs):
     
     # SEND TWEETS DATAFRAME TO GOOGLE CLOUD BUCKET
     tweet_client = storage.Client()
-    tweet_bucket = user_client.get_bucket("e-r-apache-airflow-cs280")
+    tweet_bucket = tweet_client.get_bucket("e-r-apache-airflow-cs280")
     tweet_bucket.blob("data/tweets.csv").upload_from_string(tweet_df.to_csv(index=False), "text/csv")
 
 
@@ -147,18 +148,18 @@ def get_user_pd(user_requests):
         user_df = user_df.append(data, ignore_index=True)
         
 
-    log.info("USER DATAFRAME AT THE END OF GET USER PD")
-    log.info(user_df)
+    #log.info("USER DATAFRAME AT THE END OF GET USER PD")
+    #log.info(user_df)
     return user_df
 
 
 def get_tweet_pd(last_five_tweets, tweet_requests):
     tweet_df = pd.DataFrame(columns=['tweet_id', 'user_id', 'text', 'created_at', 'retweet_count', 'favorite_count', 'date'])
-    log.info(f"TWEET DF AT BEGINNING")
-    log.info(tweet_df)
+    #log.info(f"TWEET DF AT BEGINNING")
+    #log.info(tweet_df)
 
-    log.info(f"LAST FIVE TWEETS")
-    log.info(last_five_tweets)
+   # log.info(f"LAST FIVE TWEETS")
+    #log.info(last_five_tweets)
     # PARSE THROUGH LAST FIVE TWEETS
     for t in last_five_tweets:
         for tweet in t:
@@ -189,8 +190,8 @@ def get_tweet_pd(last_five_tweets, tweet_requests):
         tweet_df = tweet_df.append(data, ignore_index=True)
 
     
-    log.info(f"TWEET DF AT END")
-    log.info(tweet_df)
+    #log.info(f"TWEET DF AT END")
+    #log.info(tweet_df)
 
     return tweet_df
 
@@ -201,8 +202,8 @@ def write_data_task_function(ti: TaskInstance, **kwargs):
     log.info("ENTERED: WRITE DATA TASK FUNCTION")
     
     user_df = pd.DataFrame(columns=['user_id', 'username','name','created_at','followers_count','following_count','tweet_count','listed_count','date'])
-    log.info(f"USER DATAFRAME BEFORE GOOGLE CLOUD CALL")
-    log.info(user_df)
+    #log.info(f"USER DATAFRAME BEFORE GOOGLE CLOUD CALL")
+    #log.info(user_df)
 
     # GET USER.CSV FROM GOOGLE BUCKET
     user_client = storage.Client()
@@ -217,6 +218,21 @@ def write_data_task_function(ti: TaskInstance, **kwargs):
     log.info(user_df)
 
     update_user_timeseries(user_df)
+
+
+    tweet_df = pd.DataFrame(columns=['tweet_id', 'user_id', 'text', 'created_at', 'retweet_count', 'favorite_count', 'date'])
+
+    # GET TWEET.CSV FROM GOOGLE CLIENT
+    tweet_client = storage.Client()
+    tweet_bucket = tweet_client.get_bucket("e-r-apache-airflow-cs280")
+    blob = tweet_bucket.get_blob('data/tweets.csv')
+
+    # CONVERT TWEETS CSV TO PANDAS DATAFRAME
+    tweet_csv = blob.download_as_string()
+    tweet_df = pd.read_csv(io.BytesIO(tweet_csv))
+
+    update_tweet_timeseries(tweet_df)
+
     return
 
 def update_user_timeseries(user_df):
@@ -225,23 +241,55 @@ def update_user_timeseries(user_df):
     session = Session()
     users_timeseries_list = session.query(User_Timeseries).all() 
     users_list = session.query(User).all()
-    log.info(f"USER LIST: {users_list}")
+    #log.info(f"USER LIST: {users_list}")
 
-    if len(users_timeseries_list) == 0:
-        # ADD USERS TO TIMESERIES
-        # LOOP THROUGH PANDAS DATAFRAME AND ADD EACH ONE
-        log.info("ENTERED THE IF STATEMENT")
-        for index, row in user_df.iterrows():
-            curr_user = session.query(User).filter(User.user_id == row['user_id']).first()
-            log.info(f"CURR_USER: {curr_user}")
-            user = User_Timeseries(user_id=row['user_id'], followers_count=row['followers_count'],
-                                   following_count=row['following_count'], tweet_count=row['tweet_count'],
-                                   listed_count=row['listed_count'], date=row['date'])
-            session.add(user)
+    
+    for index, row in user_df.iterrows():
+        curr_user = session.query(User).filter(User.user_id == row['user_id']).first()
+        #log.info(f"CURR_USER: {curr_user}")
+        user = User_Timeseries(user_id=row['user_id'], followers_count=row['followers_count'],
+                               following_count=row['following_count'], tweet_count=row['tweet_count'],
+                               listed_count=row['listed_count'], date=row['date'])
+        session.add(user)
     session.commit()
     session.close()
 
-    # does postgress replace duplicates?
+def update_tweet_timeseries(tweet_df):
+
+    # IF TWEET IS NOT IN DATABASE
+        # ADD TWEET TO DATABASE
+    # UPDATE TIMESERIES
+
+    tweet_df = pd.DataFrame(columns=['tweet_id', 'user_id', 'text', 'created_at', 'retweet_count', 'favorite_count', 'date'])
+
+    session = Session()
+    tweet_timeseries_list = session.query(Tweet_Timeseries).all() 
+    tweet_list = session.query(Tweet).all()
+
+    curr_tweet_ids = []
+    for tweet in tweet_list:
+        curr_tweet_ids.append(tweet.tweet_id)
+    
+    for index, row in tweet_df.iterrows():
+        add = True
+        if row['tweet_id'] in curr_tweet_ids:
+            add = False
+        
+        if add == True:
+            tweet = Tweet(tweet_id=row['tweet_id'], user_id=row['user_id'], text=row['text'], created_at=row['created_at'])
+            session.add(tweet)
+        
+
+        tweet_timeseries = Tweet_Timeseries(tweet_id=row['tweet_id'], retweet_count=row['retweet_count'], 
+                                            favorite_count=row['favorite_count'], date=row['date'])
+        session.add(tweet_timeseries)
+    
+    session.commit()
+    session.close()
+
+
+
+    
 
 
 with DAG(
