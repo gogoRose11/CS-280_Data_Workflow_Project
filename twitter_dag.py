@@ -6,6 +6,7 @@ from airflow.operators.python import PythonOperator
 from airflow.operators.dummy import DummyOperator
 from models.config import Session #You would import this from your config file
 from models.user import User
+from models.user_timeseries import User_Timeseries
 from models.tweet import Tweet
 from airflow.models import Variable
 from airflow.models import TaskInstance
@@ -193,6 +194,17 @@ def get_tweet_pd(tweet_requests):
 def write_data_task_function(ti: TaskInstance, **kwargs):
     log.info("ENTERED: WRITE DATA TASK FUNCTION")
     
+    user_df = pd.DataFrame(columns=['user_id', 'username','name','created_at','followers_count','following_count','tweet_count','listed_count','date'])
+    log.info(f"USER DATAFRAME BEFORE GOOGLE CLOUD CALL")
+    log.info(user_df)
+    # GET USER.CSV FROM GOOGLE BUCKET
+    user_client = storage.Client()
+    user_bucket = user_client.get_bucket("e-r-apache-airflow-cs280")
+    #user_bucket.blob("data/users.csv").upload_from_string(user_df.to_csv(index=False), "text/csv")
+
+    user_df = pd.read_csv(user_bucket.get_blob('data/users.csv'))
+    log.info(f"USER DATAFRAME AFTER GOOGLE CLOUD CALL")
+    log.info(user_df)
     return
 
 with DAG(
