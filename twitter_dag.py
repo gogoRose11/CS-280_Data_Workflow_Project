@@ -226,7 +226,8 @@ def update_user_timeseries(user_df):
         # LOOP THROUGH PANDAS DATAFRAME AND ADD EACH ONE
         log.info("ENTERED THE IF STATEMENT")
         for index, row in user_df.iterrows():
-            curr_user = session.query(User).filter(User.user_id == row['user_id'])
+            curr_user = session.query(User).filter(User.user_id == row['user_id']).first()
+            log.info(f"CURR_USER: {curr_user}")
             user = User_Timeseries(id=curr_user.id, user_id=row['user_id'], followers_count=row['followers_count'],
                                    following_count=row['following_count'], tweet_count=row['tweet_count'],
                                    listed_count=row['listed_count'], date=row['date'])
