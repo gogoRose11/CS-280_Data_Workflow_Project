@@ -262,7 +262,7 @@ def update_tweet_timeseries(tweet_df):
 
     log.info("TWEET DATAFRAME")
     log.info(tweet_df)
-    tweet_df = pd.DataFrame(columns=['tweet_id', 'user_id', 'text', 'created_at', 'retweet_count', 'favorite_count', 'date'])
+    #tweet_df = pd.DataFrame(columns=['tweet_id', 'user_id', 'text', 'created_at', 'retweet_count', 'favorite_count', 'date'])
 
     session = Session()
     tweet_timeseries_list = session.query(Tweet_Timeseries).all() 
