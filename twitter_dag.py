@@ -202,7 +202,9 @@ def write_data_task_function(ti: TaskInstance, **kwargs):
     user_bucket = user_client.get_bucket("e-r-apache-airflow-cs280")
     #user_bucket.blob("data/users.csv").upload_from_string(user_df.to_csv(index=False), "text/csv")
 
-    user_df = pd.read_csv(user_bucket.get_blob('data/users.csv'))
+    blob = user_bucket.get_blob('data/users.csv')
+    csv_contents = blob.download_as_string()
+    user_df = pd.read_csv(csv_contents)
     log.info(f"USER DATAFRAME AFTER GOOGLE CLOUD CALL")
     log.info(user_df)
     return
