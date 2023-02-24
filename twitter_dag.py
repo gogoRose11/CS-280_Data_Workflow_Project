@@ -150,6 +150,8 @@ def get_tweet_pd(last_five_tweets, tweet_requests):
     log.info(f"TWEET DF AT BEGINNING")
     log.info(tweet_df)
 
+    log.info(f"LAST FIVE TWEETS")
+    log.info(last_five_tweets)
     # PARSE THROUGH LAST FIVE TWEETS
     for t in last_five_tweets:
         for tweet in t:
