@@ -203,7 +203,7 @@ def write_data_task_function(ti: TaskInstance, **kwargs):
     #user_bucket.blob("data/users.csv").upload_from_string(user_df.to_csv(index=False), "text/csv")
 
     blob = user_bucket.get_blob('data/users.csv')
-    users_csv = blob.downoad_as_string()
+    users_csv = blob.download_as_string()
     user_df = pd.read_csv(io.BytesIO(users_csv))
 
     log.info(f"USER DATAFRAME AFTER GOOGLE CLOUD CALL")
