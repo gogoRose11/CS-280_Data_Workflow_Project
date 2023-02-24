@@ -48,6 +48,8 @@ def load_data_task_function(ti: TaskInstance, **kwargs):
         last_five_tweets.append(response.json())
     
     
+    log.info("LAST FIVE TWEETS")
+    log.info(last_five_tweets)
     # PUSH USERS LIST, TWEET LIST, AND LAST 5 TWEETS PER USER TO CALL API TASK
     ti.xcom_push("users_list", users_list)
     ti.xcom_push("tweet_list", tweets_list)
