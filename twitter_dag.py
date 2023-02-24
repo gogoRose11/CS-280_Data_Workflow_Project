@@ -13,7 +13,7 @@ from airflow.models import TaskInstance
 import pandas as pd
 from datetime import datetime
 from google.cloud import storage
-
+import io
 
 def get_auth_header():
   my_bearer_token = Variable.get("TWITTER_BEARER_TOKEN")
@@ -203,7 +203,9 @@ def write_data_task_function(ti: TaskInstance, **kwargs):
     #user_bucket.blob("data/users.csv").upload_from_string(user_df.to_csv(index=False), "text/csv")
 
     blob = user_bucket.get_blob('data/users.csv')
-    user_df = pd.read_csv(blob)
+    users_csv = blob.downoad_as_string()
+    user_df = pd.read_csv(io.BytesIO(users_csv))
+
     log.info(f"USER DATAFRAME AFTER GOOGLE CLOUD CALL")
     log.info(user_df)
     return
