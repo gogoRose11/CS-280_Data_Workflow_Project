@@ -112,7 +112,7 @@ def transform_data_task_function(ti: TaskInstance, **kwargs):
     user_bucket.blob("data/users.csv").upload_from_string(user_df.to_csv(index=False), "text/csv")
 
     # CREATE TWEET DATAFRAME
-    #tweet_df = get_tweet_pd(last_five_tweets, updated_tweets)
+    tweet_df = get_tweet_pd(last_five_tweets, updated_tweets)
 
     return
 
@@ -138,7 +138,7 @@ def get_user_pd(user_requests):
 
 
         user_df = user_df.append(data, ignore_index=True)
-        # NEED TO ADD CURR DATE SOMEWHERE HERE
+        
 
     log.info("USER DATAFRAME AT THE END OF GET USER PD")
     log.info(user_df)
@@ -147,8 +147,8 @@ def get_user_pd(user_requests):
 
 def get_tweet_pd(last_five_tweets, tweet_requests):
     tweet_df = pd.DataFrame(columns=['tweet_id', 'user_id', 'text', 'created_at', 'retweet_count', 'favorite_count', 'date'])
-
-    
+    log.info(f"TWEET DF AT BEGINNING")
+    log.info(tweet_df)
 
     # PARSE THROUGH LAST FIVE TWEETS
     for tweet in last_five_tweets:
@@ -163,21 +163,24 @@ def get_tweet_pd(last_five_tweets, tweet_requests):
         data['date'] = datetime.now()
         tweet_df = tweet_df.append(data, ignore_index=True)
 
+
     # PARSE THROUGH ALL TWEETS
-
-      
-
-    # LOOP THROUGH TWEET RESPONSES
-    for tweet in tweet_requests:
-        #resp = tweet.json()
-        resp = tweet
-        data = resp.get('data')
-        del data['edit_history_tweet_ids']
-        del data['author_id']
-        pub = data['public_metrics']
-        del data['public_metrics']
-        data.update(pub)
+    for req in tweet_requests:
+        tweet = req['data']
+        pub = tweet['public_metrics']
+        data = {}
+        data['tweet_id'] = tweet['id']
+        data['user_id'] = tweet['author_id']
+        data['text'] = tweet['text']
+        data['created_at'] = tweet['created_at']
+        data['retweet_count'] = pub['retweet_count']
+        data['favorite_count'] = pub['like_count']
+        data['date'] = datetime.now()
         tweet_df = tweet_df.append(data, ignore_index=True)
+
+    
+    log.info(f"TWEET DF AT END")
+    log.info(tweet_df)
 
     return tweet_df
 
