@@ -114,6 +114,12 @@ def transform_data_task_function(ti: TaskInstance, **kwargs):
 
     # CREATE TWEET DATAFRAME
     tweet_df = get_tweet_pd(last_five_tweets, updated_tweets)
+    
+    # SEND TWEETS DATAFRAME TO GOOGLE CLOUD BUCKET
+    tweet_client = storage.Client()
+    tweet_bucket = user_client.get_bucket("e-r-apache-airflow-cs280")
+    tweet_bucket.blob("data/tweets.csv").upload_from_string(tweet_df.to_csv(index=False), "text/csv")
+
 
     return
 
