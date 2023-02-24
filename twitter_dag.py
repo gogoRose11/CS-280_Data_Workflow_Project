@@ -112,7 +112,7 @@ def transform_data_task_function(ti: TaskInstance, **kwargs):
     user_bucket.blob("data/users.csv").upload_from_string(user_df.to_csv(index=False), "text/csv")
 
     # CREATE TWEET DATAFRAME
-    tweet_df = get_tweet_pd(last_five_tweets, updated_tweets)
+    #tweet_df = get_tweet_pd(last_five_tweets, updated_tweets)
 
     return
 
@@ -148,34 +148,23 @@ def get_user_pd(user_requests):
 def get_tweet_pd(last_five_tweets, tweet_requests):
     tweet_df = pd.DataFrame(columns=['tweet_id', 'user_id', 'text', 'created_at', 'retweet_count', 'favorite_count', 'date'])
 
-    # tweet_id, user_id, text, created_at ... retweet_count, favorite_count, date
+    
 
     # PARSE THROUGH LAST FIVE TWEETS
     for tweet in last_five_tweets:
-        resp = tweet
-        id = tweet['id']
-        del tweet['id']
-        tweet['tweet_id'] = id  # RENAME ID TO TWEET_ID
-        del tweet['id_str']
-        del tweet['truncated']
-        del tweet['entities']
-        del tweet['urls']
-        del tweet['source']
-        user = resp.get('user')
-        del tweet['user']
-        tweet['user_id'] = user['id'] # RENAME THE ID IN USER TO USER_ID
-        del tweet['geo']
-        del tweet['coordinates']
-        del tweet['place']
-        del tweet['contributors']
-        del tweet['retweeted_status']
-        del tweet['is_quote_status']
-        del tweet['favorited']
-        del tweet['retweeted']
-        del tweet['possibly_sensitive']
-        del tweet['lang']
+        user = tweet['user']
+        data = {}
+        data['tweet_id'] = tweet['id']
+        data['user_id'] = user['id']
+        data['text'] = tweet['text']
+        data['created_at'] = tweet['created_at']
+        data['retweet_count'] = tweet['retweet_count']
+        data['favorite_count'] = tweet['favorite_count']
+        data['date'] = datetime.now()
+        tweet_df = tweet_df.append(data, ignore_index=True)
 
-        # NNEED TO ADD CURR DATE WHEN PULLED
+    # PARSE THROUGH ALL TWEETS
+
       
 
     # LOOP THROUGH TWEET RESPONSES
