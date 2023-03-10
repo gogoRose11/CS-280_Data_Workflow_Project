@@ -1,8 +1,23 @@
 from models.config import Session #You would import this from your config file
 from models.countries import Country
 
-session = Session()
+import pandas as pd
+from datetime import datetime
+import pendulum
+import requests
 
+
+
+
+x = requests.get('https://api.covid19api.com/countries')
+
+print("FIRST COUNTRY")
+print(x[0])
+
+
+
+
+session = Session()
 # This will retrieve all of the users from the database 
 # (It'll be a list, so you may have 100 users or 0 users)
 test = session.query(Country).all() 
