@@ -11,8 +11,9 @@ import requests
 
 x = requests.get('https://api.covid19api.com/countries')
 
+country_x = x.json()
 print("FIRST COUNTRY")
-print(x[0])
+print(country_x[0])
 
 
 
