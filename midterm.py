@@ -41,6 +41,9 @@ def pop_country_totals(country_list):
     print(totals[0]['Date'])
     print(type(totals[0]['Date']))
 
+    date_string = totals[0]['Date']
+    datetime_obj = datetime.datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S.%f %z')
+
     #print(f"STATUS SECTION REQUEST FOR: {country_name}")
     #stat = status.json()
    # print(stat[0])
@@ -49,7 +52,7 @@ def pop_country_totals(country_list):
     session = Session()
     
 
-    country_total = CountryTotals(country_id=country['ID'], province=country['Province'], city=country['City'], city_code=country['CityCode'], lat=country['Lat'], long=country['Lon'], cases=country['Active'], status_confirmed=['Confirmed'], status_deaths=['Deaths'], datetime=['Date'])
+    country_total = CountryTotals(country_id=country['ID'], province=country['Province'], city=country['City'], city_code=country['CityCode'], lat=country['Lat'], long=country['Lon'], cases=country['Active'], status_confirmed=['Confirmed'], status_deaths=['Deaths'], datetime=datetime_obj)
 
     session.add(country_total)
     #session.flush()
