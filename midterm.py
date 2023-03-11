@@ -9,32 +9,30 @@ import requests
 
 
 
-x = requests.get('https://api.covid19api.com/countries')
+def populate_countries_table():
 
-country_list = x.json()
-#print("FIRST COUNTRY")
-#print(country_list[0])
+    x = requests.get('https://api.covid19api.com/countries')
+
+    country_list = x.json()
+    session = Session()
+    session.flush()
+    print(f"NUM COUNTRIES: {len(country_list)}")
+
+    for i in range(len(country_list)):
+        country = Country(country=country_list[i]['Country'],
+                            slug=country_list[i]['Slug'],
+                            iso2=country_list[i]['ISO2'])
+        session.add(country)
+
+    session.commit()
+    session.clost()
+
+populate_countries_table()
 
 
 
 
-session = Session()
 
-session.flush()
-
-
-
-for i in range(5):
-    #country = country_list[i]['Country']
-    #slug = country_list[i]['Slug']
-    #iso2 = country_list[i]['ISO2']
-
-    country = Country(country=country_list[i]['Country'],
-                        slug=country_list[i]['Slug'],
-                        iso2=country_list[i]['ISO2'])
-    session.add(country)
-
-session.commit()
 # This will retrieve all of the users from the database 
 # (It'll be a list, so you may have 100 users or 0 users)
 #test = session.query(Country).all() 
@@ -51,4 +49,4 @@ session.commit()
 #nasaUsername = nasaUser.username
 
 # This will close the session that you opened at the beginning of the file.
-session.close()
+#session.close()
