@@ -30,7 +30,7 @@ def populate_countries_table(country_list):
 def pop_country_totals(country_list):
 
     country_name = country_list[0]['Slug']
-    time.sleep(5)
+    #time.sleep(5)
     #status = requests.get(f"https://api.covid19api.com/country/{country_name}/status/confirmed?from=2020-03-01T00:00:00Z&to=2022-03-01T00:00:00Z")
     x = requests.get(f"https://api.covid19api.com/country/{country_name}?from=2020-03-01T00:00:00Z&to=2022-03-01T00:00:00Z")
     print(f"COUNTRY TOTALS FOR: {country_name}")
@@ -48,14 +48,17 @@ def pop_country_totals(country_list):
     #stat = status.json()
    # print(stat[0])
 
-    country = totals[1]
+    country = totals[0]
     session = Session()
     
     print(f"CONFIRMED: {country['Confirmed']}")
     print(f"DEATHS: {country['Deaths']}")
-    country_total = CountryTotals(country_id=country['ID'], province=country['Province'], city=country['City'], city_code=country['CityCode'], lat=country['Lat'], long=country['Lon'], cases=country['Active'], status_confirmed=['Confirmed'], status_deaths=['Deaths'], datetime=datetime_obj)
+    country_total1 = CountryTotals(country_id=country['ID'], province=country['Province'], city=country['City'], city_code=country['CityCode'], lat=country['Lat'], long=country['Lon'], cases=country['Confirmed'], status='confirmed', datetime=datetime_obj)
+    session.add(country_total1)
+    country_total2 = CountryTotals(country_id=country['ID'], province=country['Province'], city=country['City'], city_code=country['CityCode'], lat=country['Lat'], long=country['Lon'], cases=country['Deaths'], status='deaths', datetime=datetime_obj)
+    session.add(country_total2)
+    
 
-    session.add(country_total)
     #session.flush()
     session.commit()
     session.close()
