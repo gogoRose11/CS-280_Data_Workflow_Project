@@ -29,6 +29,9 @@ def populate_countries_table(country_list):
 
 def pop_country_totals(country_list):
 
+    #time.sleep(5)
+
+
     country_name = country_list[0]['Slug']
     time.sleep(5)
     #status = requests.get(f"https://api.covid19api.com/country/{country_name}/status/confirmed?from=2020-03-01T00:00:00Z&to=2022-03-01T00:00:00Z")
@@ -37,29 +40,30 @@ def pop_country_totals(country_list):
     totals = x.json()
     print(totals[0])
 
-    print("DATE COLUMN TEST")
-    print(totals[0]['Date'])
-    print(type(totals[0]['Date']))
-
-    date_string = totals[0]['Date']
-    datetime_obj = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%SZ')
-
-    #print(f"STATUS SECTION REQUEST FOR: {country_name}")
-    #stat = status.json()
-   # print(stat[0])
-
-    country = totals[0]
     session = Session()
-    
-    print(f"CONFIRMED: {country['Confirmed']}")
-    print(f"DEATHS: {country['Deaths']}")
-    country_total1 = CountryTotals(country_id=country['ID'], province=country['Province'], city=country['City'], city_code=country['CityCode'], lat=country['Lat'], long=country['Lon'], cases=country['Confirmed'], status='confirmed', datetime=datetime_obj)
-    session.add(country_total1)
-    country_total2 = CountryTotals(country_id=country['ID'], province=country['Province'], city=country['City'], city_code=country['CityCode'], lat=country['Lat'], long=country['Lon'], cases=country['Deaths'], status='deaths', datetime=datetime_obj)
-    session.add(country_total2)
-    
+    real_country_id = session.query.(Country).filter(Country.slug == country_name).first()
 
-    #session.flush()
+    for i in range(len(totals)):
+
+        date_string = totals[i]['Date']
+        datetime_obj = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%SZ')
+
+        #print(f"STATUS SECTION REQUEST FOR: {country_name}")
+        #stat = status.json()
+    # print(stat[0])
+
+        country = totals[i]
+        
+        
+        
+        country_total1 = CountryTotals(country_id=real_country_id, province=country['Province'], city=country['City'], city_code=country['CityCode'], lat=country['Lat'], long=country['Lon'], cases=country['Confirmed'], status='confirmed', datetime=datetime_obj)
+        session.add(country_total1)
+        country_total2 = CountryTotals(country_id=real_country_id, province=country['Province'], city=country['City'], city_code=country['CityCode'], lat=country['Lat'], long=country['Lon'], cases=country['Deaths'], status='deaths', datetime=datetime_obj)
+        session.add(country_total2)
+        
+
+        #session.flush()
+    
     session.commit()
     session.close()
 
