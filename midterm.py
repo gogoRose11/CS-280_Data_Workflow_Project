@@ -27,7 +27,24 @@ def populate_countries_table():
     session.commit()
     session.close()
 
-populate_countries_table()
+
+
+def pop_country_totals():
+
+    country_name = country_list[0]['Country']
+
+    x = requests.get(f"https://api.covid19api.com/country/{country_name}?from=2020-03-01T00:00:00Z&to=2022-03-01T00:00:00Z")
+    print(f"COUNTRY TOTALS FOR: {country_name}")
+    totals = x.json()
+    print(totals)
+
+
+# POPULATE COUNTRIES TABLE
+#populate_countries_table()
+
+# POPULATE COUNTRY TOTALS TABLE
+pop_country_totals()
+
 
 
 
