@@ -32,7 +32,7 @@ def pop_country_totals(country_list):
     #time.sleep(5)
 
     #session = Session()
-    for i in range(126, len(country_list)):
+    for i in range(127, len(country_list)):
         session = Session()
         print(f"FOR LOOP ITERATION: {i}")
         # time.sleep(5)
