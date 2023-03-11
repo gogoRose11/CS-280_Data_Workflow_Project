@@ -1,5 +1,6 @@
 from models.config import Session #You would import this from your config file
 from models.countries import Country
+from models.country_totals import CountryTotals
 
 import pandas as pd
 from datetime import datetime
@@ -28,11 +29,35 @@ def populate_countries_table(country_list):
 def pop_country_totals(country_list):
 
     country_name = country_list[0]['Slug']
-
+    status = requests.get(f"https://api.covid19api.com/country/{country_name}/status/confirmed?from=2020-03-01T00:00:00Z&to=2022-03-01T00:00:00Z")
     x = requests.get(f"https://api.covid19api.com/country/{country_name}?from=2020-03-01T00:00:00Z&to=2022-03-01T00:00:00Z")
     print(f"COUNTRY TOTALS FOR: {country_name}")
     totals = x.json()
     print(totals[0])
+
+    print(f"STATUS SECTION REQUEST FOR: {country_name}")
+    stat = status.json()
+    print(stat[0])
+
+    country = totals[0]
+    session = Session()
+    session.flush()
+
+    country_total = CountryTotals(country_id=country['ID'],
+                                    province=country['Province'],
+                                    city=country['City'],
+                                    city_code=country['CityCode'],
+                                    lat=country['Lat'],
+                                    long=country['Lon'],
+                                    cases=country['Active'],
+                                    status_confirmed=['Confirmed'],
+                                    status_deaths=['Deaths'],
+                                    datetime=['Date']
+                                    )
+
+    session.add(country_total)
+    session.commit()
+    session.close()
 
 
 
