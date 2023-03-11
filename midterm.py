@@ -31,32 +31,35 @@ def pop_country_totals(country_list):
 
     #time.sleep(5)
 
-
-    country_name = country_list[0]['Slug']
-    time.sleep(5)
-    x = requests.get(f"https://api.covid19api.com/country/{country_name}?from=2020-03-01T00:00:00Z&to=2022-03-01T00:00:00Z")
-    print(f"COUNTRY TOTALS FOR: {country_name}")
-    totals = x.json()
-    print(totals[0])
-
     session = Session()
-    real_country = session.query(Country).filter(Country.slug == country_name).first()
-    real_country_id = real_country.id
+    for i in range(len(country_list)):
+        time.sleep(5)
+        country_name = country_list[i]['Slug']
+        time.sleep(5)
+        x = requests.get(f"https://api.covid19api.com/country/{country_name}?from=2020-03-01T00:00:00Z&to=2022-03-01T00:00:00Z")
+        print(f"COUNTRY TOTALS FOR: {country_name}")
+        totals = x.json()
+        #print(totals[0])
 
-    for i in range(len(totals)):
-
-        date_string = totals[i]['Date']
-        datetime_obj = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%SZ')
-
-
-        country = totals[i]
         
-        
-        
-        country_total1 = CountryTotals(country_id=real_country_id, province=country['Province'], city=country['City'], city_code=country['CityCode'], lat=country['Lat'], long=country['Lon'], cases=country['Confirmed'], status='confirmed', datetime=datetime_obj)
-        session.add(country_total1)
-        country_total2 = CountryTotals(country_id=real_country_id, province=country['Province'], city=country['City'], city_code=country['CityCode'], lat=country['Lat'], long=country['Lon'], cases=country['Deaths'], status='deaths', datetime=datetime_obj)
-        session.add(country_total2)
+        real_country = session.query(Country).filter(Country.slug == country_name).first()
+        real_country_id = real_country.id
+
+        # DO IT AS LONG AS IT ISN'T THE U.S. OR CHINA
+        if country_name != 'united-states' and country_name != 'china':
+            for j in range(len(totals)):
+
+                date_string = totals[j]['Date']
+                datetime_obj = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%SZ')
+
+                country = totals[j]
+                
+                
+                
+                country_total1 = CountryTotals(country_id=real_country_id, province=country['Province'], city=country['City'], city_code=country['CityCode'], lat=country['Lat'], long=country['Lon'], cases=country['Confirmed'], status='confirmed', datetime=datetime_obj)
+                session.add(country_total1)
+                country_total2 = CountryTotals(country_id=real_country_id, province=country['Province'], city=country['City'], city_code=country['CityCode'], lat=country['Lat'], long=country['Lon'], cases=country['Deaths'], status='deaths', datetime=datetime_obj)
+                session.add(country_total2)
         
 
         #session.flush()
@@ -71,7 +74,7 @@ x = requests.get('https://api.covid19api.com/countries')
 time.sleep(5)
 country_list = x.json()
 
-print(country_list[0])
+#print(country_list[0])
 
 # POPULATE COUNTRIES TABLE
 #populate_countries_table()
