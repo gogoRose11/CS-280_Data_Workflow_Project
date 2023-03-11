@@ -36,10 +36,10 @@ def pop_country_totals(country_list):
         print(f"FOR LOOP ITERATION: {i}")
         #time.sleep(5)
         country_name = country_list[i]['Slug']
-        time.sleep(5)
+        #time.sleep(5)
+        print(f"COUNTRY TOTALS FOR: {country_name}")
         x = requests.get(f"https://api.covid19api.com/country/{country_name}?from=2020-03-01T00:00:00Z&to=2022-03-01T00:00:00Z")
         time.sleep(5)
-        print(f"COUNTRY TOTALS FOR: {country_name}")
         totals = x.json()
         #print(totals[0])
 
@@ -55,8 +55,6 @@ def pop_country_totals(country_list):
                 datetime_obj = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%SZ')
 
                 country = totals[j]
-                
-                
                 
                 country_total1 = CountryTotals(country_id=real_country_id, province=country['Province'], city=country['City'], city_code=country['CityCode'], lat=country['Lat'], long=country['Lon'], cases=country['Confirmed'], status='confirmed', datetime=datetime_obj)
                 session.add(country_total1)
