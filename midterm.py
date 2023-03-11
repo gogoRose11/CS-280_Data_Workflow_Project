@@ -48,10 +48,11 @@ def pop_country_totals(country_list):
     #stat = status.json()
    # print(stat[0])
 
-    country = totals[0]
+    country = totals[1]
     session = Session()
     
-
+    print(f"CONFIRMED: {country['Confirmed']}")
+    print(f"DEATHS: {country['Deaths']}")
     country_total = CountryTotals(country_id=country['ID'], province=country['Province'], city=country['City'], city_code=country['CityCode'], lat=country['Lat'], long=country['Lon'], cases=country['Active'], status_confirmed=['Confirmed'], status_deaths=['Deaths'], datetime=datetime_obj)
 
     session.add(country_total)
