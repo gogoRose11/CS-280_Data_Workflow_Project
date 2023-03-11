@@ -40,25 +40,17 @@ def pop_country_totals(country_list):
    # print(stat[0])
 
     country = totals[0]
-   # session = Session()
+    session = Session()
     
 
-   # country_total = CountryTotals(country_id=country['ID'],
-    #                                province=country['Province'],
-     #                               city=country['City'],
-      #                              city_code=country['CityCode'],
-       #                             lat=country['Lat'],
-        #                            long=country['Lon'],
-         #                           cases=country['Active'],
-          #                          status_confirmed=['Confirmed'],
-           #                         status_deaths=['Deaths'],
-            #                        datetime=['Date']
-             #                       )
+    country_total = CountryTotals(country_id=country['ID'], province=country['Province'], city=country['City'], 
+                                city_code=country['CityCode'], lat=country['Lat'], long=country['Lon'],
+                                cases=country['Active'], status_confirmed=['Confirmed'], status_deaths=['Deaths'], datetime=['Date'])
 
-   # session.add(country_total)
+    session.add(country_total)
     #session.flush()
-    #session.commit()
-    #session.close()
+    session.commit()
+    session.close()
 
 
 
