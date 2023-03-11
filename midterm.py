@@ -33,10 +33,12 @@ def pop_country_totals(country_list):
 
     session = Session()
     for i in range(len(country_list)):
-        time.sleep(5)
+        print(f"FOR LOOP ITERATION: {i}")
+        #time.sleep(5)
         country_name = country_list[i]['Slug']
         time.sleep(5)
         x = requests.get(f"https://api.covid19api.com/country/{country_name}?from=2020-03-01T00:00:00Z&to=2022-03-01T00:00:00Z")
+        time.sleep(5)
         print(f"COUNTRY TOTALS FOR: {country_name}")
         totals = x.json()
         #print(totals[0])
