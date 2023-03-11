@@ -72,7 +72,7 @@ print(country_list[0])
 #populate_countries_table()
 
 # POPULATE COUNTRY TOTALS TABLE
-#pop_country_totals(country_list)
+pop_country_totals(country_list)
 
 
 
