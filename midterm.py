@@ -29,19 +29,19 @@ def populate_countries_table(country_list):
 def pop_country_totals(country_list):
 
     country_name = country_list[0]['Slug']
-    status = requests.get(f"https://api.covid19api.com/country/{country_name}/status/confirmed?from=2020-03-01T00:00:00Z&to=2022-03-01T00:00:00Z")
+    #status = requests.get(f"https://api.covid19api.com/country/{country_name}/status/confirmed?from=2020-03-01T00:00:00Z&to=2022-03-01T00:00:00Z")
     x = requests.get(f"https://api.covid19api.com/country/{country_name}?from=2020-03-01T00:00:00Z&to=2022-03-01T00:00:00Z")
     print(f"COUNTRY TOTALS FOR: {country_name}")
     totals = x.json()
     print(totals[0])
 
-    print(f"STATUS SECTION REQUEST FOR: {country_name}")
-    stat = status.json()
-    print(stat[0])
+    #print(f"STATUS SECTION REQUEST FOR: {country_name}")
+    #stat = status.json()
+   # print(stat[0])
 
     country = totals[0]
     session = Session()
-    session.flush()
+    
 
     country_total = CountryTotals(country_id=country['ID'],
                                     province=country['Province'],
@@ -56,6 +56,7 @@ def pop_country_totals(country_list):
                                     )
 
     session.add(country_total)
+    session.flush()
     session.commit()
     session.close()
 
