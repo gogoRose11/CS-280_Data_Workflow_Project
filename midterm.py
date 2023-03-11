@@ -31,8 +31,9 @@ def pop_country_totals(country_list):
 
     #time.sleep(5)
 
-    session = Session()
-    for i in range(len(country_list)):
+    #session = Session()
+    for i in range(0, 3):
+        session = Session()
         print(f"FOR LOOP ITERATION: {i}")
         #time.sleep(5)
         country_name = country_list[i]['Slug']
@@ -60,12 +61,14 @@ def pop_country_totals(country_list):
                 session.add(country_total1)
                 country_total2 = CountryTotals(country_id=real_country_id, province=country['Province'], city=country['City'], city_code=country['CityCode'], lat=country['Lat'], long=country['Lon'], cases=country['Deaths'], status='deaths', datetime=datetime_obj)
                 session.add(country_total2)
+        session.commit()
+        session.clost()
         
 
         #session.flush()
     
-    session.commit()
-    session.close()
+    #session.commit()
+    #session.close()
 
 
 
