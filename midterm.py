@@ -35,6 +35,10 @@ def pop_country_totals(country_list):
     totals = x.json()
     print(totals[0])
 
+    print("DATE COLUMN TEST")
+    print(totals[0]['Date'])
+    print(type(totals[0]['Date']))
+
     #print(f"STATUS SECTION REQUEST FOR: {country_name}")
     #stat = status.json()
    # print(stat[0])
