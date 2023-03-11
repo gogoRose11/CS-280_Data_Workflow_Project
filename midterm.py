@@ -11,18 +11,34 @@ import requests
 
 x = requests.get('https://api.covid19api.com/countries')
 
-country_x = x.json()
-print("FIRST COUNTRY")
-print(country_x[0])
+country_list = x.json()
+#print("FIRST COUNTRY")
+#print(country_list[0])
 
 
 
 
 session = Session()
+
+
+
+
+
+for i in range(5):
+    #country = country_list[i]['Country']
+    #slug = country_list[i]['Slug']
+    #iso2 = country_list[i]['ISO2']
+
+    country = Country(country=country_list[i]['Country'],
+                        slug=country_list[i]['Slug'],
+                        iso2=country_list[i]['ISO2'])
+    session.add(country)
+
+session.commit()
 # This will retrieve all of the users from the database 
 # (It'll be a list, so you may have 100 users or 0 users)
-test = session.query(Country).all() 
-print(f"TEST: {test}")
+#test = session.query(Country).all() 
+#print(f"TEST: {test}")
 
 
 # This will retrieve the user who's username is NASA
