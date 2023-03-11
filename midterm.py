@@ -66,11 +66,13 @@ def pop_country_totals(country_list):
 x = requests.get('https://api.covid19api.com/countries')
 country_list = x.json()
 
+print(country_list[0])
+
 # POPULATE COUNTRIES TABLE
 #populate_countries_table()
 
 # POPULATE COUNTRY TOTALS TABLE
-pop_country_totals(country_list)
+#pop_country_totals(country_list)
 
 
 
