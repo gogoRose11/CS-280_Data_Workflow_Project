@@ -9,11 +9,7 @@ import requests
 
 
 
-def populate_countries_table():
-
-    x = requests.get('https://api.covid19api.com/countries')
-
-    country_list = x.json()
+def populate_countries_table(country_list):
     session = Session()
     session.flush()
     print(f"NUM COUNTRIES: {len(country_list)}")
@@ -29,7 +25,7 @@ def populate_countries_table():
 
 
 
-def pop_country_totals():
+def pop_country_totals(country_list):
 
     country_name = country_list[0]['Country']
 
@@ -39,11 +35,16 @@ def pop_country_totals():
     print(totals)
 
 
+
+# PULL COUNTRY LIST
+x = requests.get('https://api.covid19api.com/countries')
+country_list = x.json()
+
 # POPULATE COUNTRIES TABLE
 #populate_countries_table()
 
 # POPULATE COUNTRY TOTALS TABLE
-pop_country_totals()
+pop_country_totals(country_list)
 
 
 
