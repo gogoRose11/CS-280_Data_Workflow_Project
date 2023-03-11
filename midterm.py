@@ -40,7 +40,8 @@ def pop_country_totals(country_list):
     print(totals[0])
 
     session = Session()
-    real_country_id = session.query(Country).filter(Country.slug == country_name)
+    real_country = session.query(Country).filter(Country.slug == country_name)
+    real_country_id = real_country.id
 
     for i in range(len(totals)):
 
