@@ -32,7 +32,7 @@ def pop_country_totals(country_list):
     x = requests.get(f"https://api.covid19api.com/country/{country_name}?from=2020-03-01T00:00:00Z&to=2022-03-01T00:00:00Z")
     print(f"COUNTRY TOTALS FOR: {country_name}")
     totals = x.json()
-    print(totals)
+    print(totals[0])
 
 
 
