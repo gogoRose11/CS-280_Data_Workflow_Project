@@ -20,7 +20,7 @@ country_list = x.json()
 
 session = Session()
 
-
+session.flush()
 
 
 
