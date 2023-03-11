@@ -25,7 +25,7 @@ def populate_countries_table():
         session.add(country)
 
     session.commit()
-    session.clost()
+    session.close()
 
 populate_countries_table()
 
