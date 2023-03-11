@@ -42,7 +42,7 @@ def pop_country_totals(country_list):
     print(type(totals[0]['Date']))
 
     date_string = totals[0]['Date']
-    datetime_obj = datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S %z')
+    datetime_obj = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%SZ')
 
     #print(f"STATUS SECTION REQUEST FOR: {country_name}")
     #stat = status.json()
